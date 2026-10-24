@@ -6,4 +6,4 @@ Pomodoro · Habits (w/ streaks) · To-do kanban · Bookmarks · Notes · Reminde
 ![Vite](https://img.shields.io/badge/Vite-646CFF?style=flat-square&logo=vite&logoColor=white)
 ![Tailwind CSS](https://img.shields.io/badge/Tailwind-38BDF8?style=flat-square&logo=tailwindcss&logoColor=white)
 
-[Live Demo](https://wecitra.github.io/focus-space) · [Feedback & Bug](https://github.com/doobeedoobeedam/focus-space/issues)
+[Live Demo](https://doobeedoobeedam.github.io/focus-space) · [Feedback & Bug](https://github.com/doobeedoobeedam/focus-space/issues)
