@@ -59,3 +59,29 @@ export function toInputDateTime(milliseconds) {
   const d = new Date(milliseconds)
   return dateKey(d) + 'T' + pad(d.getHours()) + ':' + pad(d.getMinutes())
 }
+
+const MONTH_NAMES = [
+  'January', 'February', 'March', 'April', 'May', 'June',
+  'July', 'August', 'September', 'October', 'November', 'December',
+]
+
+// ubah waktu (milidetik) jadi teks
+export function formatDateTime(milliseconds) {
+  const d = new Date(milliseconds)
+
+  // ubah jam 24-jam jadi 12-jam + AM/PM
+  let hours = d.getHours()
+  let ampm = 'AM'
+  if (hours >= 12) {
+    ampm = 'PM'
+  }
+  hours = hours % 12
+  if (hours === 0) {
+    hours = 12
+  }
+
+  return (
+    d.getDate() + ' ' + MONTH_NAMES[d.getMonth()] + ' ' + d.getFullYear() +
+    ', ' + hours + ':' + pad(d.getMinutes()) + ' ' + ampm
+  )
+}

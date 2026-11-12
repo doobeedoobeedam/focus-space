@@ -5,7 +5,7 @@ import PageHeader from '../components/PageHeader.vue'
 import BaseModal from '../components/BaseModal.vue'
 import { permission, askPermission } from '../logic/notify'
 import { now } from '../logic/reminders'
-import { makeId, findIndexById, toInputDateTime, formatRemaining } from '../logic/helpers'
+import { makeId, findIndexById, toInputDateTime, formatRemaining, formatDateTime } from '../logic/helpers'
 
 const form = ref(null)
 const quickLabel = ref('') 
@@ -57,6 +57,15 @@ function saveForm() {
 
   const index = findIndexById(state.reminders, reminder.id)
   if (index >= 0) {
+    const oldReminder = state.reminders[index]
+
+    // kalau waktunya tidak diubah (cuma edit teks), pertahankan status lamanya
+    // supaya reminder yang sudah selesai tidak bunyi lagi
+    if (toInputDateTime(oldReminder.at) === data.when) {
+      reminder.at = oldReminder.at
+      reminder.fired = oldReminder.fired
+    }
+
     state.reminders[index] = reminder
   } else {
     state.reminders.push(reminder)
@@ -114,7 +123,7 @@ function deleteReminder(reminder) {
         <div class="text-3xl">{{ reminder.fired ? '✅' : '⏰' }}</div>
         <div class="min-w-0 flex-1">
           <div class="font-bold truncate">{{ reminder.title }}</div>
-          <div class="text-xs opacity-60">{{ new Date(reminder.at).toLocaleString('en-US') }}</div>
+          <div class="text-xs opacity-60">{{ formatDateTime(reminder.at) }}</div>
           <div class="flex gap-3 mt-1">
             <button class="link-btn" @click="openForm(reminder)">Edit</button>
             <button class="link-btn" @click="deleteReminder(reminder)">Delete</button>

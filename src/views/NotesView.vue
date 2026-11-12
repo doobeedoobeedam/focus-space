@@ -2,7 +2,7 @@
 import { ref } from 'vue'
 import { state } from '../store'
 import PageHeader from '../components/PageHeader.vue'
-import { makeId, findIndexById } from '../logic/helpers'
+import { makeId, findIndexById, formatDateTime } from '../logic/helpers'
 
 const search = ref('')
 const selectedId = ref(null) // id note yang lagi dibuka
@@ -64,7 +64,7 @@ function markUpdated() {
     </PageHeader>
 
     <div class="grid md:grid-cols-[260px_1fr] gap-4">
-      <div class="card rounded-3xl p-3 space-y-2 md:max-h-[70vh] overflow-auto">
+      <div class="card rounded-3xl p-3 space-y-2 max-h-52 md:max-h-[70vh] overflow-auto">
         <input class="inp" v-model="search" placeholder="Search notes..." />
 
         <button
@@ -84,13 +84,13 @@ function markUpdated() {
       <!-- editor -->
       <div v-if="getSelectedNote()" class="card rounded-3xl p-5">
         <input
-          class="w-full bg-transparent text-3xl font-extrabold outline-none"
+          class="w-full bg-transparent text-3xl font-extrabold outline-none focus:outline-none focus-visible:outline-none"
           v-model="getSelectedNote().title"
           @input="markUpdated"
           placeholder="Title"
         />
         <div class="text-xs opacity-50 mb-3">
-          edited {{ new Date(getSelectedNote().updated).toLocaleString('en-US') }}
+          edited {{ formatDateTime(getSelectedNote().updated) }}
         </div>
         <textarea
           class="w-full min-h-[50vh] bg-transparent outline-none resize-none leading-relaxed"

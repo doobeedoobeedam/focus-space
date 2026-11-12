@@ -20,6 +20,7 @@ const priorityColors = {
 const form = ref(null)
 const draggedId = ref(null) // id card yang lagi di-drag
 const hoverColumn = ref(null)
+const hoverTaskId = ref(null) // id card yang lagi disentuh card yang di-drag (BARU)
 
 // ambil semua task di satu kolom
 function tasksInColumn(columnId) {
@@ -59,22 +60,67 @@ function deleteTask(task) {
   }
 }
 
-function onDragStart(task) {
+function onDragStart(event, task) {
   draggedId.value = task.id
+
+  // katanya firefox butuh dua baris ini supaya drag bisa jalan
+  event.dataTransfer.setData('text/plain', task.id)
+  event.dataTransfer.effectAllowed = 'move'
 }
 
+// saat card di-drag melewati card lain -> tandai card itu sebagai target
+function onDragOverTask(task, columnId) {
+  hoverTaskId.value = task.id
+  hoverColumn.value = columnId
+}
+
+// saat card di-drag melewati area kosong kolom
+function onDragOverColumn(columnId) {
+  hoverColumn.value = columnId
+  hoverTaskId.value = null
+}
+
+// reset semua penanda drag
+function resetDrag() {
+  draggedId.value = null
+  hoverColumn.value = null
+  hoverTaskId.value = null
+}
+
+// card dilepas di atas card lain -> taruh tepat sebelum card itu
+function onDropOnTask(targetTask) {
+  if (draggedId.value === targetTask.id) {
+    resetDrag()
+    return
+  }
+
+  const fromIndex = findIndexById(state.tasks, draggedId.value)
+  if (fromIndex >= 0) {
+    const task = state.tasks[fromIndex]
+    state.tasks.splice(fromIndex, 1) // cabut dari posisi lama
+    task.status = targetTask.status // ikut kolom card target
+
+    // cari posisi target lagi (karena array sudah bergeser), lalu sisipkan sebelum target
+    const toIndex = findIndexById(state.tasks, targetTask.id)
+    state.tasks.splice(toIndex, 0, task)
+  }
+  resetDrag()
+}
+
+// card dilepas di area kosong kolom -> taruh paling bawah di kolom itu
 function onDrop(columnId) {
   const index = findIndexById(state.tasks, draggedId.value)
   if (index >= 0) {
-    state.tasks[index].status = columnId
+    const task = state.tasks[index]
+    state.tasks.splice(index, 1)
+    task.status = columnId
+    state.tasks.push(task) // paling akhir di array = paling bawah di kolom
   }
-  draggedId.value = null
-  hoverColumn.value = null
+  resetDrag()
 }
 
 function onDragEnd() {
-  draggedId.value = null
-  hoverColumn.value = null
+  resetDrag()
 }
 </script>
 
@@ -90,7 +136,7 @@ function onDragEnd() {
         :key="column.id"
         class="card rounded-3xl p-3 min-h-[220px]"
         :class="hoverColumn === column.id ? 'drop' : ''"
-        @dragover.prevent="hoverColumn = column.id"
+        @dragover.prevent="onDragOverColumn(column.id)"
         @dragleave="hoverColumn = null"
         @drop.prevent="onDrop(column.id)"
       >
@@ -103,9 +149,15 @@ function onDragEnd() {
           v-for="task in tasksInColumn(column.id)"
           :key="task.id"
           draggable="true"
-          @dragstart="onDragStart(task)"
+          @dragstart="onDragStart($event, task)"
           @dragend="onDragEnd"
+          @dragover.prevent.stop="onDragOverTask(task, column.id)"
+          @drop.prevent.stop="onDropOnTask(task)"
           class="rounded-2xl p-3 mb-2 cursor-grab bg-white dark:bg-white/10 border border-black/10 dark:border-white/10"
+          :class="[
+            hoverTaskId === task.id && draggedId !== task.id ? 'ring-2 ring-pink' : '',
+            draggedId === task.id ? 'opacity-40' : '',
+          ]"
         >
           <div class="font-semibold" :class="task.status === 'done' ? 'line-through opacity-50' : ''">
             {{ task.title }}
