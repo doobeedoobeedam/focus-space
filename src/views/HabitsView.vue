@@ -3,7 +3,7 @@ import { ref } from 'vue'
 import { state } from '../store'
 import PageHeader from '../components/PageHeader.vue'
 import BaseModal from '../components/BaseModal.vue'
-import { dateKey, makeId, findIndexById } from '../logic/helpers'
+import { dateKey, makeId, findIndexById, formatDate } from '../logic/helpers'
 import { getProgress, getStatus, getStreak, addCheckIn } from '../logic/habitHelpers'
 
 // form tambah/edit. null = form tertutup
@@ -15,7 +15,7 @@ const statusText = {
   ended: 'Finished',
 }
 
-// kalau `habit` diisi = mode edit, kalau kosong = mode tambah baru
+// kalau 'habit' diisi = mode edit, kalau kosong = mode tambah baru
 function openForm(habit) {
   if (habit) {
     form.value = Object.assign({}, habit)
@@ -56,12 +56,18 @@ function deleteHabit(habit) {
 
 // emoji yang masih abu-abu -> tambah 1 check-in
 // emoji yang sudah berwarna -> batalkan 1 check-in
+// klik emoji ke-N -> isi semua emoji sampai ke-N sekaligus
+// klik emoji terakhir yang sudah terisi: batalkan 1 (supaya bisa dikosongkan lagi)
 function clickEmoji(habit, number) {
-  if (number > getProgress(habit)) {
-    addCheckIn(habit, 1)
-  } else {
-    addCheckIn(habit, -1)
+  const current = getProgress(habit)
+
+  let newProgress = number
+  if (number === current) {
+    newProgress = number - 1
   }
+
+  // tambah (atau kurangi) check-in hari ini sebesar selisihnya
+  addCheckIn(habit, newProgress - current)
 }
 
 // berapa emoji yang ditampilkan (maksimal 24)
@@ -92,7 +98,7 @@ function barWidth(habit) {
             <div class="font-extrabold text-xl">{{ habit.name }}</div>
             <div class="text-sm opacity-60">
               {{ habit.target }}x per {{ habit.period === 'day' ? 'day' : 'week' }}
-              · {{ habit.start || 'now' }} → {{ habit.end || 'no end' }}
+              · {{ habit.start ? formatDate(habit.start) : 'now' }} → {{ habit.end ? formatDate(habit.end) : 'no end' }}
             </div>
           </div>
           <span

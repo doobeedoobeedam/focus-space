@@ -100,8 +100,8 @@ function deleteBookmark(bookmark) {
       Nothing here yet. Paste a URL from X, Instagram, YouTube, Pinterest, or Google.
     </div>
 
-    <div class="grid md:grid-cols-2 gap-4">
-      <div v-for="item in getVisibleBookmarks()" :key="item.id" class="card rounded-3xl p-4 flex gap-3">
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div v-for="item in getVisibleBookmarks()" :key="item.id" class="card rounded-3xl p-4 flex gap-3 min-w-0">
         <div
           class="w-12 h-12 shrink-0 rounded-2xl grid place-items-center text-xl text-white font-extrabold"
           :style="{ background: sources[getSource(item.url)].color }"
@@ -114,7 +114,7 @@ function deleteBookmark(bookmark) {
             {{ item.title || item.url }}
           </a>
           <div class="text-xs opacity-60 truncate">{{ getSource(item.url) }} · {{ item.url }}</div>
-          <div v-if="item.note" class="text-sm mt-1 opacity-80">{{ item.note }}</div>
+          <div v-if="item.note" class="text-sm mt-1 opacity-80 break-words">{{ item.note }}</div>
           <div class="flex gap-3 mt-2">
             <button class="link-btn" @click="openForm(item)">Edit</button>
             <button class="link-btn" @click="deleteBookmark(item)">Delete</button>

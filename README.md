@@ -1,4 +1,4 @@
-# ☁️ Focus Space
+<img src="public/favicon.svg" width="18" height="20" alt="✦" valign="middle" /> <b>focus space</b>
 
 Pomodoro · Habits (w/ streaks) · To-do kanban · Bookmarks · Notes · Reminders
 

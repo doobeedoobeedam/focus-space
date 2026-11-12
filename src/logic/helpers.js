@@ -61,8 +61,8 @@ export function toInputDateTime(milliseconds) {
 }
 
 const MONTH_NAMES = [
-  'January', 'February', 'March', 'April', 'May', 'June',
-  'July', 'August', 'September', 'October', 'November', 'December',
+  'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+  'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec',
 ]
 
 // ubah waktu (milidetik) jadi teks
@@ -84,4 +84,12 @@ export function formatDateTime(milliseconds) {
     d.getDate() + ' ' + MONTH_NAMES[d.getMonth()] + ' ' + d.getFullYear() +
     ', ' + hours + ':' + pad(d.getMinutes()) + ' ' + ampm
   )
+}
+
+export function formatDate(dateText) {
+  const parts = dateText.split('-')
+  const year = parts[0]
+  const month = Number(parts[1]) - 1 // di array, bulan mulai dari 0
+  const day = Number(parts[2])
+  return day + ' ' + MONTH_NAMES[month] + ' ' + year
 }
